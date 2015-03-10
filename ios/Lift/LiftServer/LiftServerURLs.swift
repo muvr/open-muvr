@@ -122,6 +122,11 @@ enum LiftServerURLs : LiftServerRequestConvertible {
     case ExerciseSessionSubmitData(/*userId: */NSUUID, /*sessionId: */NSUUID)
     
     ///
+    /// Submits the feedback for the given ``userId``, ``sessionId``
+    ///
+    case ExerciseSessionSubmitFeedback(/*userId: */NSUUID, /*sessionId: */NSUUID)
+    
+    ///
     /// Gets exercise classification examples for the given ``userId`` and ``sessionId``
     ///
     case ExerciseSessionGetClassificationExamples(/*userId: */NSUUID, /*sessionId: */NSUUID)
@@ -183,6 +188,7 @@ enum LiftServerURLs : LiftServerRequestConvertible {
                     
                 case .ExerciseSessionStart(let userId): return LiftServerRequest(path: "/exercise/\(userId.UUIDString)/start", method: Method.POST)
                 case .ExerciseSessionSubmitData(let userId, let sessionId): return LiftServerRequest(path: "/exercise/\(userId.UUIDString)/\(sessionId.UUIDString)", method: Method.PUT)
+                case .ExerciseSessionSubmitFeedback(let userId, let sessionId): return LiftServerRequest(path: "/exercise/\(userId.UUIDString)/\(sessionId.UUIDString)/feedback", method: Method.POST)
                 case .ExerciseSessionEnd(let userId, let sessionId): return LiftServerRequest(path: "/exercise/\(userId.UUIDString)/\(sessionId.UUIDString)/end", method: Method.POST)
                     
                 case .ExerciseSessionAbandon(let userId, let sessionId): return LiftServerRequest(path: "/exercise/\(userId.UUIDString)/\(sessionId.UUIDString)/abandon", method: Method.POST)

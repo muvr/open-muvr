@@ -20,6 +20,14 @@ class LiveSessionController: UIPageViewController, UIPageViewControllerDataSourc
     private var pageControl: UIPageControl!
     @IBOutlet var stopSessionButton: UIBarButtonItem!
     
+    override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
+        if let ctrl = segue.destinationViewController as? SessionFeedbackController {
+            if let exerciseSessionId = sender as? NSUUID {
+                ctrl.setExerciseSession(exerciseSessionId)
+            }
+        }
+    }
+    
     // MARK: main
     override func viewWillDisappear(animated: Bool) {
         if let x = timer { x.invalidate() }
@@ -44,6 +52,7 @@ class LiveSessionController: UIPageViewController, UIPageViewControllerDataSourc
     
     func end() {
         if let x = exerciseSession {
+            performSegueWithIdentifier("toSessionFeedback", sender: x.id)
             x.end(const(()))
             self.exerciseSession = nil
         } else {
@@ -52,9 +61,6 @@ class LiveSessionController: UIPageViewController, UIPageViewControllerDataSourc
         
         multi?.stop()
         UIApplication.sharedApplication().idleTimerDisabled = false
-        if let x = navigationController {
-            x.popToRootViewControllerAnimated(true)
-        }
     }
     
     override func viewDidLoad() {

@@ -23,6 +23,13 @@ class ExerciseSession : NSObject {
     func submitData(mp: NSData, f: Result<Void> -> Void) -> Void {
         LiftServer.sharedInstance.exerciseSessionSubmitData(CurrentLiftUser.userId!, sessionId: id, data: mp, f: f)
     }
+
+    ///
+    /// Send feedback about the current session, then ends it
+    ///
+    func submitFeedback(feedback: SessionFeedback, f: Result<Void> -> Void) -> Void {
+        LiftServer.sharedInstance.exerciseSessionSubmitFeedback(feedback, userId: CurrentLiftUser.userId!, sessionId: id, f: f)
+    }
     
     ///
     /// Ends the current session. After ending, this instance is not re-usable
