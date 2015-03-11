@@ -1,27 +1,30 @@
 import Foundation
 
-class SessionFeedbackController : UITableViewController {
-    var exerciseSession: NSUUID? = nil
+class SessionFeedbackController : UIViewController {
+    var exerciseSession: ExerciseSession? = nil
     
-    func setExerciseSession(exerciseSession: NSUUID) {
+    func setExerciseSession(exerciseSession: ExerciseSession) {
         self.exerciseSession = exerciseSession
     }
     
     func sendFeedback(feedback: SessionFeedback) {
-        print("I got \(feedback) about session: \(exerciseSession)")
-        navigationController?.popToRootViewControllerAnimated(true)
+        println("I got \(feedback.description) about session: \(exerciseSession)")
+        exerciseSession?.submitFeedback(feedback) { (_) in
+            self.exerciseSession?.end(const(()))
+            self.exerciseSession = nil
+        }
+        self.navigationController?.popToRootViewControllerAnimated(true)
+    }
+    @IBAction func sendPositveFeedback() {
+        sendFeedback(.Postive)
+    }
+    @IBAction func sendNeutralFeedback() {
+        sendFeedback(.Neutral)
     }
     
     @IBAction func sendNegativeFeedback() {
-        
-        sendFeedback(.Neutral)
-    }
-    @IBAction func sendNeutralFeedback() {
-        print("I am neutral about session: \(exerciseSession)")
         sendFeedback(.Negative)
     }
-    @IBAction func sendPositveFeedback() {
-        print("I am happy with session: \(exerciseSession)")
-        sendFeedback(.Postive)
-    }
+    
+
 }

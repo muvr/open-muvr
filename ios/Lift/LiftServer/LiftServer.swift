@@ -3,12 +3,12 @@ import Foundation
 /**
  * Session Feedback
  */
-enum SessionFeedback {
-    case Postive
-    case Neutral
-    case Negative
+enum SessionFeedback: Int {
+    case Postive = 1
+    case Neutral = 0
+    case Negative = -1
     
-    var description : String {
+    var description: String {
         switch self {
         case .Postive: return "Postive Feedback";
         case .Neutral: return "Neutral Feedback";
@@ -16,13 +16,7 @@ enum SessionFeedback {
         }
     }
     
-    var value: Int {
-        switch self {
-        case .Postive: return +1;
-        case .Neutral: return 0;
-        case .Negative: return -1;
-        }
-    }
+
 }
 
 /**
@@ -448,7 +442,7 @@ public class LiftServer {
     /// Submit feedback
     ///
     func exerciseSessionSubmitFeedback(feedback: SessionFeedback, userId: NSUUID, sessionId: NSUUID, f: Result<Void> -> Void) -> Void {
-        request(LiftServerURLs.ExerciseSessionSubmitFeedback(userId, sessionId), body: Body.Json(params: ["value": feedback.value]))
+        request(LiftServerURLs.ExerciseSessionSubmitFeedback(userId, sessionId), body: Body.Json(params: ["value": feedback.rawValue]))
             .responseAsResult(asu(), f, const(()))
     }
     

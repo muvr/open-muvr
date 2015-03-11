@@ -22,8 +22,8 @@ class LiveSessionController: UIPageViewController, UIPageViewControllerDataSourc
     
     override func prepareForSegue(segue: UIStoryboardSegue, sender: AnyObject?) {
         if let ctrl = segue.destinationViewController as? SessionFeedbackController {
-            if let exerciseSessionId = sender as? NSUUID {
-                ctrl.setExerciseSession(exerciseSessionId)
+            if let exerciseSession = sender as? ExerciseSession {
+                ctrl.setExerciseSession(exerciseSession)
             }
         }
     }
@@ -52,8 +52,7 @@ class LiveSessionController: UIPageViewController, UIPageViewControllerDataSourc
     
     func end() {
         if let x = exerciseSession {
-            performSegueWithIdentifier("toSessionFeedback", sender: x.id)
-            x.end(const(()))
+            performSegueWithIdentifier("toSessionFeedback", sender: x)
             self.exerciseSession = nil
         } else {
             NSLog("[WARN] LiveSessionController.end() with sessionId == nil")
