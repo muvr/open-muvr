@@ -38,8 +38,7 @@ object LiftLocalMonolithApp extends App with LiftMonolith {
     // register the shared journal
     implicit val timeout = Timeout(15.seconds)
     val f = system.actorSelection(path) ? Identify(None)
-    val x = Await.result(f, 15.seconds)
-    x match {
+    Await.result(f, 15.seconds) match {
       case ActorIdentity(_, Some(ref)) ⇒ SharedLeveldbJournal.setStore(ref, system)
       case x ⇒
         system.log.error("Shared journal not started at {}", path)
