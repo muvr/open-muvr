@@ -55,6 +55,13 @@ trait ExerciseService extends Directives with ExerciseMarshallers {
         }
       }
     } ~
+    path("exercise" / UserIdValue / SessionIdValue / "feedback") { (userId, sessionId) ⇒
+      post {
+        handleWith { feedback: SessionFeedback =>
+          (userExercisesProcessor ? UserExerciseSessionFeedback(userId, sessionId, feedback)).mapRight[Unit]
+        }
+      }
+    } ~
     path("exercise" / UserIdValue / SessionIdValue) { (userId, sessionId) ⇒
       get {
         complete {
