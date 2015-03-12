@@ -18,9 +18,7 @@
                     </navigationItem>
                     <connections>
                         <outlet property="stopSessionButton" destination="YTD-AN-SqM" id="6h1-kb-H6a"/>
-                        <segue destination="k05-ul-cPV" kind="popover" identifier="toSessionFeedback" id="aok-FW-tgc">
-                            <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
-                        </segue>
+                        <segue destination="k05-ul-cPV" kind="push" identifier="toSessionFeedback" id="aok-FW-tgc"/>
                     </connections>
                 </pageViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5cE-7d-jgD" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -190,9 +188,7 @@
                     <connections>
                         <outlet property="stopSessionButton" destination="Je9-vz-Gde" id="VLB-vo-qS6"/>
                         <outlet property="tableView" destination="eag-Dc-egS" id="hSd-3N-tk3"/>
-                        <segue destination="k05-ul-cPV" kind="popover" id="ZqL-S8-pOD">
-                            <popoverArrowDirection key="popoverArrowDirection" up="YES" down="YES" left="YES" right="YES"/>
-                        </segue>
+                        <segue destination="k05-ul-cPV" kind="push" id="ZqL-S8-pOD"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tnv-c5-jLc" userLabel="First Responder" sceneMemberID="firstResponder"/>

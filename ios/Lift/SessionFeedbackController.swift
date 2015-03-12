@@ -3,6 +3,11 @@ import Foundation
 class SessionFeedbackController : UIViewController {
     var exerciseSession: ExerciseSession? = nil
     
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        self.navigationItem.setHidesBackButton(true, animated: false)
+    }
+    
     func setExerciseSession(exerciseSession: ExerciseSession) {
         self.exerciseSession = exerciseSession
     }
