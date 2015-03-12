@@ -1,6 +1,25 @@
 import Foundation
 
 /**
+ * Session Feedback
+ */
+enum SessionFeedback: Int {
+    case Postive = 1
+    case Neutral = 0
+    case Negative = -1
+    
+    var description: String {
+        switch self {
+        case .Postive: return "Postive Feedback";
+        case .Neutral: return "Neutral Feedback";
+        case .Negative: return "Negative Feedback";
+        }
+    }
+    
+
+}
+
+/**
  * Maintains the availability of the server connection
  */
 struct AvailabilityState {
@@ -416,6 +435,14 @@ public class LiftServer {
     ///
     func exerciseSessionSubmitData(userId: NSUUID, sessionId: NSUUID, data: NSData, f: Result<Void> -> Void) -> Void {
         request(LiftServerURLs.ExerciseSessionSubmitData(userId, sessionId), body: .Data(data: data))
+            .responseAsResult(asu(), f, const(()))
+    }
+    
+    ///
+    /// Submit feedback
+    ///
+    func exerciseSessionSubmitFeedback(feedback: SessionFeedback, userId: NSUUID, sessionId: NSUUID, f: Result<Void> -> Void) -> Void {
+        request(LiftServerURLs.ExerciseSessionSubmitFeedback(userId, sessionId), body: Body.Json(params: ["value": feedback.rawValue]))
             .responseAsResult(asu(), f, const(()))
     }
     

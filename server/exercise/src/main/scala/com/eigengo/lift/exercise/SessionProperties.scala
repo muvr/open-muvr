@@ -8,6 +8,9 @@ import com.eigengo.lift.Exercise.{ExerciseIntensity, MuscleGroupKey}
  * The session identity
  * @param id the id
  */
+@SerialVersionUID(1103l) case class SessionFeedback(value: Int) extends AnyVal {
+  override def toString = value.toString
+}
 @SerialVersionUID(1010l) case class SessionId(id: UUID) extends AnyVal {
   override def toString = id.toString
 }
