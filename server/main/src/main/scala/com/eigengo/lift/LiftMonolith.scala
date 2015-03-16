@@ -37,10 +37,8 @@ trait LiftMonolith {
   /**
    * Implementations can perform any logic required to start or join a journal
    * @param system the ActorSystem that needs the journal starting or looking up
-   * @param startStore ``true`` if this is the first time this function is being called
-   * @param path the path for the actor that represents the journal
    */
-  def journalStartUp(system: ActorSystem, startStore: Boolean, path: ActorPath): Unit
+  def journalStartUp(system: ActorSystem): Unit
 
   /**
    * Starts up the Lift ActorSystem, binding Akka remoting to ``port`` and exposing all
@@ -49,18 +47,11 @@ trait LiftMonolith {
    * @param restPort the REST services port
    */
   final def actorSystemStartUp(port: Int, restPort: Int): Unit = {
-    import scala.collection.JavaConverters._
-    // Override the configuration of the port
-    val firstSeedNodePort = (for {
-      seedNode ← config.getStringList("akka.cluster.seed-nodes").asScala
-      port ← ActorPath.fromString(seedNode).address.port
-    } yield port).head
-
     // Create an Akka system
     implicit val system = ActorSystem(LiftActorSystem, ConfigFactory.parseString(s"akka.remote.netty.tcp.port=$port").withFallback(config))
 
     // Startup the journal - typically this is only used when running locally with a levelDB journal
-    journalStartUp(system, port == firstSeedNodePort, ActorPath.fromString(s"akka.tcp://$LiftActorSystem@127.0.0.1:$firstSeedNodePort/user/store"))
+    journalStartUp(system)
 
     // boot the microservices
     val profile = ProfileBoot.boot
