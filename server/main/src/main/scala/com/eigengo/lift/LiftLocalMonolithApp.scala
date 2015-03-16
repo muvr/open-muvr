@@ -26,10 +26,12 @@ object LiftLocalMonolithApp extends App with LiftMonolith {
       .withFallback(ConfigFactory.load("main.conf"))
   }
 
-  def getOrStartStore(system: ActorSystem): ActorRef = store.getOrElse {
-    val ref = system.actorOf(Props[SharedLeveldbStore], "store")
-    store = Some(ref)
-    ref
+  def getOrStartStore(system: ActorSystem): ActorRef = this.synchronized {
+    store.getOrElse {
+      val ref = system.actorOf(Props[SharedLeveldbStore], "store")
+      store = Some(ref)
+      ref
+    }
   }
 
   override def journalStartUp(system: ActorSystem): Unit = {
