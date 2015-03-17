@@ -3,18 +3,14 @@ package com.eigengo.lift
 import collection.JavaConversions._
 import akka.actor._
 import akka.persistence.journal.leveldb.{SharedLeveldbJournal, SharedLeveldbStore}
-import akka.util.Timeout
 import com.eigengo.lift.common.MicroserviceApp.MicroserviceProps
 import com.typesafe.config.ConfigFactory
-import spray.routing.{HttpServiceActor, Route}
-
-import scala.concurrent.Await
 
 /**
  * CLI application for the exercise app
  */
 object LiftLocalMonolithApp extends App with LiftMonolith {
-  var store: Option[ActorRef] = None
+  private var store: Option[ActorRef] = None
 
   lazy val config = {
     val microserviceProps = MicroserviceProps("Lift")
@@ -26,13 +22,14 @@ object LiftLocalMonolithApp extends App with LiftMonolith {
       .withFallback(ConfigFactory.load("main.conf"))
   }
 
-  def getOrStartStore(system: ActorSystem): ActorRef = this.synchronized {
+  // Guaranteed to be race-free as long it is called only `journalStartUp` which in turn is called only from
+  // `actorSystemStartUp` which is called in a `foreach` in the constructor below
+  private def getOrStartStore(system: ActorSystem): ActorRef =
     store.getOrElse {
       val ref = system.actorOf(Props[SharedLeveldbStore], "store")
       store = Some(ref)
       ref
     }
-  }
 
   override def journalStartUp(system: ActorSystem): Unit = {
     // Start the shared journal one one node (don't crash this SPOF)
