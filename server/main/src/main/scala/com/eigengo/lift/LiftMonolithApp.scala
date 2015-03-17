@@ -11,7 +11,7 @@ import com.typesafe.config.ConfigFactory
 object LiftMonolithApp extends App with LiftMonolith {
 
   // no journal startup code needed
-  override def journalStartUp(system: ActorSystem, startStore: Boolean, path: ActorPath): Unit = ()
+  override def journalStartUp(system: ActorSystem): Unit = ()
 
   // In production, Akka and REST port numbers are obtained from environment variables in production.conf
   lazy val config = {

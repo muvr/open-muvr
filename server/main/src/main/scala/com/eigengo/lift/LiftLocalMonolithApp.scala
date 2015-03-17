@@ -3,17 +3,14 @@ package com.eigengo.lift
 import collection.JavaConversions._
 import akka.actor._
 import akka.persistence.journal.leveldb.{SharedLeveldbJournal, SharedLeveldbStore}
-import akka.util.Timeout
 import com.eigengo.lift.common.MicroserviceApp.MicroserviceProps
 import com.typesafe.config.ConfigFactory
-import spray.routing.{HttpServiceActor, Route}
-
-import scala.concurrent.Await
 
 /**
  * CLI application for the exercise app
  */
 object LiftLocalMonolithApp extends App with LiftMonolith {
+  private var store: Option[ActorRef] = None
 
   lazy val config = {
     val microserviceProps = MicroserviceProps("Lift")
@@ -25,25 +22,20 @@ object LiftLocalMonolithApp extends App with LiftMonolith {
       .withFallback(ConfigFactory.load("main.conf"))
   }
 
-  override def journalStartUp(system: ActorSystem, startStore: Boolean, path: ActorPath): Unit = {
-    import akka.pattern.ask
-    import scala.concurrent.duration._
+  // Guaranteed to be race-free as long it is called only `journalStartUp` which in turn is called only from
+  // `actorSystemStartUp` which is called in a `foreach` in the constructor below
+  private def getOrStartStore(system: ActorSystem): ActorRef =
+    store.getOrElse {
+      val ref = system.actorOf(Props[SharedLeveldbStore], "store")
+      store = Some(ref)
+      ref
+    }
 
+  override def journalStartUp(system: ActorSystem): Unit = {
     // Start the shared journal one one node (don't crash this SPOF)
     // This will not be needed with a distributed journal
-    if (startStore) {
-      system.actorOf(Props[SharedLeveldbStore], "store")
-    }
-
-    // register the shared journal
-    implicit val timeout = Timeout(15.seconds)
-    val f = system.actorSelection(path) ? Identify(None)
-    Await.result(f, 15.seconds) match {
-      case ActorIdentity(_, Some(ref)) ⇒ SharedLeveldbJournal.setStore(ref, system)
-      case x ⇒
-        system.log.error("Shared journal not started at {}", path)
-        system.shutdown()
-    }
+    val ref = getOrStartStore(system)
+    SharedLeveldbJournal.setStore(ref, system)
   }
 
   val ports = config.getIntList("akka.cluster.jvm-ports")
