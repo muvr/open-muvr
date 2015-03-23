@@ -77,11 +77,8 @@ struct LiftUserDefaults {
     ///
     static var isRunningTests: Bool {
         get {
-            let environment = NSProcessInfo.processInfo().environment
-            if let injectBundle = environment["XCInjectBundle"] as? String {
-                return injectBundle.pathExtension == "xctest"
-            }
-            return false
+            let xCInjectBundle = NSProcessInfo.processInfo().environment["XCInjectBundle"] as? String
+            return xCInjectBundle?.pathExtension == "xctest"
         }
     }
     

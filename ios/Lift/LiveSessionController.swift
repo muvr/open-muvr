@@ -30,7 +30,7 @@ class LiveSessionController: UIPageViewController, UIPageViewControllerDataSourc
     
     // MARK: main
     override func viewWillDisappear(animated: Bool) {
-        if let x = timer { x.invalidate() }
+        timer?.invalidate()
         navigationItem.prompt = nil
         pageControl.removeFromSuperview()
         pageControl = nil
