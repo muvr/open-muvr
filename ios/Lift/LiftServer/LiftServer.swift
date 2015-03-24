@@ -111,14 +111,14 @@ extension Request {
     func responseAsResult<A, U>(asu: AvailabilityStateUpdate, f: Result<A> -> U, completionHandler: (JSON) -> A) -> Void {
         
         func tryCompleteFromCache(error: NSError, request: NSURLRequest, f: Result<A> -> U, completionHandler: (JSON) -> A) {
-            if let method = request.HTTPMethod {
-                if method.lowercaseString != "get" {
-                    NSLog("--- Non-GET cannot be cached %@.", request.URLString)
-                    f(Result.error(error))
+
+            if request.HTTPMethod?.lowercaseString != "get" {
+                NSLog("--- Non-GET cannot be cached %@.", request.URLString)
+                f(Result.error(error))
                     
-                    return
-                }
+                return
             }
+            
             if let x = NSURLCache.sharedURLCache().cachedResponseForRequest(request) {
                 // we have a cached response
                 let s = NSString(data: x.data, encoding: NSUTF8StringEncoding)
