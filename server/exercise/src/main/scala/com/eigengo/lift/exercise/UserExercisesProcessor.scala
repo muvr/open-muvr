@@ -186,6 +186,14 @@ object UserExercisesProcessor {
   case class UserExerciseSessionEnd(userId: UserId, sessionId: SessionId)
 
   /**
+   * Feedback about the user exercise session
+   * @param userId the user identity
+   * @param sessionId the generated sessionProps identity
+   * @param feedback the user feedback about his session
+   */
+  case class UserExerciseSessionFeedback(userId: UserId, sessionId: SessionId, feedback: SessionFeedback)
+
+  /**
    * The sessionProps has started
    * @param sessionProps the sessionProps identity
    */
@@ -196,6 +204,12 @@ object UserExercisesProcessor {
    * @param sessionId the sessionProps identity
    */
   private case class ExerciseSessionEnd(sessionId: SessionId)
+
+  /**
+   * The session is about to end, this is the feedback
+   * @param feedback the user feedback about his session
+   */
+  private case class ExerciseSessionFeedback(sessionId: SessionId, feedback: SessionFeedback)
 
   /**
    * Remove the specified ``sessionId``
@@ -217,6 +231,7 @@ object UserExercisesProcessor {
   val idExtractor: ShardRegion.IdExtractor = {
     case UserExerciseSessionStart(userId, session)                            ⇒ (userId.toString, ExerciseSessionStart(session))
     case UserExerciseSessionEnd(userId, sessionId)                            ⇒ (userId.toString, ExerciseSessionEnd(sessionId))
+    case UserExerciseSessionFeedback(userId, sessionId, feedback)             ⇒ (userId.toString, ExerciseSessionFeedback(sessionId, feedback))
     case UserExerciseDataProcessMultiPacket(userId, sessionId, packets)       ⇒ (userId.toString, ExerciseDataProcessMultiPacket(sessionId, packets))
     case UserExerciseSessionDelete(userId, sessionId)                         ⇒ (userId.toString, ExerciseSessionDelete(sessionId))
     case UserExerciseSessionAbandon(userId, sessionId)                        ⇒ (userId.toString, ExerciseSessionAbandon(sessionId))
@@ -233,11 +248,12 @@ object UserExercisesProcessor {
   val shardResolver: ShardRegion.ShardResolver = {
     case UserExerciseSessionStart(userId, _)                   ⇒ s"${userId.hashCode() % 10}"
     case UserExerciseSessionEnd(userId, _)                     ⇒ s"${userId.hashCode() % 10}"
+    case UserExerciseSessionFeedback(userId, _, _)             ⇒ s"${userId.hashCode() % 10}"
     case UserExerciseDataProcessMultiPacket(userId, _, _)      ⇒ s"${userId.hashCode() % 10}"
     case UserExerciseSessionDelete(userId, _)                  ⇒ s"${userId.hashCode() % 10}"
     case UserExerciseSessionAbandon(userId, _)                 ⇒ s"${userId.hashCode() % 10}"
     case UserExerciseExplicitClassificationStart(userId, _, _) ⇒ s"${userId.hashCode() % 10}"
-   case UserExerciseExplicitClassificationEnd(userId, _)       ⇒ s"${userId.hashCode() % 10}"
+    case UserExerciseExplicitClassificationEnd(userId, _)       ⇒ s"${userId.hashCode() % 10}"
     case UserExerciseSessionReplayProcessData(userId, _, _)    ⇒ s"${userId.hashCode() % 10}"
     case UserExerciseSessionReplayStart(userId, _, _)          ⇒ s"${userId.hashCode() % 10}"
     case UserExerciseSetSuggestions(userId, _)                 ⇒ s"${userId.hashCode() % 10}"
@@ -366,6 +382,13 @@ class UserExercisesProcessor(notification: ActorRef, userProfile: ActorRef)
           sender() ! \/.right(())
         }
 
+      case ExerciseSessionFeedback(`id`, feedback) ⇒
+        log.info("ExerciseSessionFeedback: exercising -> exercising.")
+        persist(SessionFeedbackEvt(id, feedback)) { evt ⇒
+          saveSnapshot(evt)
+          sender() ! \/.right(())
+        }
+
       case ExerciseSessionAbandon(`id`) ⇒
         abandon()
         context.become(notExercising)
@@ -435,6 +458,9 @@ class UserExercisesProcessor(notification: ActorRef, userProfile: ActorRef)
       context.become(replaying(oldSessionId, newSessionId, sessionProps))
 
     case ExerciseSessionEnd(_) ⇒
+      sender() ! \/.left("Not in session")
+
+    case ExerciseSessionFeedback(_, _) ⇒
       sender() ! \/.left("Not in session")
 
     case ExerciseSessionDelete(sessionId) ⇒

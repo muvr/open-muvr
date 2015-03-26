@@ -1,6 +1,25 @@
 import Foundation
 
 /**
+ * Session Feedback
+ */
+enum SessionFeedback: Int {
+    case Postive = 1
+    case Neutral = 0
+    case Negative = -1
+    
+    var description: String {
+        switch self {
+        case .Postive: return "Postive Feedback";
+        case .Neutral: return "Neutral Feedback";
+        case .Negative: return "Negative Feedback";
+        }
+    }
+    
+
+}
+
+/**
  * Maintains the availability of the server connection
  */
 struct AvailabilityState {
@@ -92,14 +111,14 @@ extension Request {
     func responseAsResult<A, U>(asu: AvailabilityStateUpdate, f: Result<A> -> U, completionHandler: (JSON) -> A) -> Void {
         
         func tryCompleteFromCache(error: NSError, request: NSURLRequest, f: Result<A> -> U, completionHandler: (JSON) -> A) {
-            if let method = request.HTTPMethod {
-                if method.lowercaseString != "get" {
-                    NSLog("--- Non-GET cannot be cached %@.", request.URLString)
-                    f(Result.error(error))
+
+            if request.HTTPMethod?.lowercaseString != "get" {
+                NSLog("--- Non-GET cannot be cached %@.", request.URLString)
+                f(Result.error(error))
                     
-                    return
-                }
+                return
             }
+            
             if let x = NSURLCache.sharedURLCache().cachedResponseForRequest(request) {
                 // we have a cached response
                 let s = NSString(data: x.data, encoding: NSUTF8StringEncoding)
@@ -416,6 +435,14 @@ public class LiftServer {
     ///
     func exerciseSessionSubmitData(userId: NSUUID, sessionId: NSUUID, data: NSData, f: Result<Void> -> Void) -> Void {
         request(LiftServerURLs.ExerciseSessionSubmitData(userId, sessionId), body: .Data(data: data))
+            .responseAsResult(asu(), f, const(()))
+    }
+    
+    ///
+    /// Submit feedback
+    ///
+    func exerciseSessionSubmitFeedback(feedback: SessionFeedback, userId: NSUUID, sessionId: NSUUID, f: Result<Void> -> Void) -> Void {
+        request(LiftServerURLs.ExerciseSessionSubmitFeedback(userId, sessionId), body: Body.Json(params: ["value": feedback.rawValue]))
             .responseAsResult(asu(), f, const(()))
     }
     

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6750" systemVersion="14C109" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6750" systemVersion="14C1510" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none">
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6735"/>
     </dependencies>
@@ -18,11 +18,12 @@
                     </navigationItem>
                     <connections>
                         <outlet property="stopSessionButton" destination="YTD-AN-SqM" id="6h1-kb-H6a"/>
+                        <segue destination="k05-ul-cPV" kind="push" identifier="toSessionFeedback" id="aok-FW-tgc"/>
                     </connections>
                 </pageViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="5cE-7d-jgD" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="200" y="2968"/>
+            <point key="canvasLocation" x="205" y="2946"/>
         </scene>
         <!--Analysis-->
         <scene sceneID="val-vv-QQY">
@@ -187,11 +188,12 @@
                     <connections>
                         <outlet property="stopSessionButton" destination="Je9-vz-Gde" id="VLB-vo-qS6"/>
                         <outlet property="tableView" destination="eag-Dc-egS" id="hSd-3N-tk3"/>
+                        <segue destination="k05-ul-cPV" kind="push" id="ZqL-S8-pOD"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="tnv-c5-jLc" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-298" y="2968"/>
+            <point key="canvasLocation" x="-346" y="2946"/>
         </scene>
         <!--Profile-->
         <scene sceneID="Dfb-qx-PZq">
@@ -753,6 +755,55 @@
             </objects>
             <point key="canvasLocation" x="-26" y="-751"/>
         </scene>
+        <!--Session Feedback Controller-->
+        <scene sceneID="Nti-8Z-CCz">
+            <objects>
+                <viewController id="k05-ul-cPV" customClass="SessionFeedbackController" customModule="Lift" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="xiw-Px-b06">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="tsU-1c-jcf">
+                                <rect key="frame" x="193" y="93" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Yay">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="sendPositveFeedback" destination="k05-ul-cPV" eventType="touchUpInside" id="OKi-IU-GXm"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="hfP-sA-dXg">
+                                <rect key="frame" x="192" y="163" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Meh">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="sendNeutralFeedback" destination="k05-ul-cPV" eventType="touchUpInside" id="GMe-f8-zfZ"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" id="djP-2B-9wf">
+                                <rect key="frame" x="192" y="241" width="30" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Agh">
+                                    <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                </state>
+                                <connections>
+                                    <action selector="sendNegativeFeedback" destination="k05-ul-cPV" eventType="touchUpInside" id="uDy-TI-Ype"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                    <toolbarItems/>
+                    <navigationItem key="navigationItem" id="VHz-a9-UXz"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="RVM-om-ug0" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-54" y="3933"/>
+        </scene>
     </scenes>
     <resources>
         <image name="chart" width="649" height="671"/>
@@ -768,5 +819,6 @@
     <inferredMetricsTieBreakers>
         <segue reference="chT-fI-k57"/>
         <segue reference="gLX-x3-ad0"/>
+        <segue reference="aok-FW-tgc"/>
     </inferredMetricsTieBreakers>
 </document>

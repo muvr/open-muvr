@@ -67,6 +67,12 @@ object UserExercises {
   case class SessionEndedEvt(sessionId: SessionId)
 
   /**
+   * User gave feedback about Session
+   * @param feedback the session id
+   */
+  case class SessionFeedbackEvt(sessionId: SessionId, feedback: SessionFeedback)
+
+  /**
    * Manual classification started event.
    * @param sessionId the session id
    * @param exercise the exercise

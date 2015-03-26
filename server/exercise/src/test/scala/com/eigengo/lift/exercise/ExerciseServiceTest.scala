@@ -58,6 +58,14 @@ object ExerciseServiceTest {
         |]
       """.stripMargin)
 
+    val feedback = SessionFeedback(-1)
+    val feedbackEntity = HttpEntity(ContentTypes.`application/json`,
+      """
+        |{
+        |"value" : -1
+        |}
+      """.stripMargin)
+
     val suggestions = Suggestions(
       Suggestion.Session(dateFormat.parse("2015-02-20"), SuggestionSource.History, List("arms"), 1.0) ::
         Suggestion.Rest(dateFormat.parse("2015-02-21"), SuggestionSource.Programme) ::
@@ -87,6 +95,9 @@ object ExerciseServiceTest {
             sender ! TestData.sessionDates
             TestActor.KeepRunning
           case UserExerciseSessionEnd(_, _) ⇒
+            sender ! \/.right(())
+            TestActor.KeepRunning
+          case UserExerciseSessionFeedback(_, _, _) ⇒
             sender ! \/.right(())
             TestActor.KeepRunning
           case UserExerciseExplicitClassificationStart(_, _, _) ⇒
@@ -204,6 +215,14 @@ class ExerciseServiceTest
     }
 
     probe.expectMsg(UserExerciseSessionEnd(TestData.userId, TestData.sessionId))
+  }
+
+  it should "listen at POST exercise/:UserIdValue/:SessionIdValue/feedback endpoint" in {
+    Post(s"/exercise/${TestData.userId.id}/${TestData.sessionId.id}/feedback").withEntity(TestData.feedbackEntity) ~> underTest ~> check {
+      response.entity.asString should be(TestData.emptyResponse)
+    }
+
+    probe.expectMsg(UserExerciseSessionFeedback(TestData.userId, TestData.sessionId, TestData.feedback))
   }
 
   it should "listen at POST exercise/:UserIdValue/:SessionIdValue/classification endpoint" in {

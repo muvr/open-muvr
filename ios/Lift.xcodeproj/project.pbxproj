@@ -154,6 +154,7 @@
 		54F780B91A278EFC00E4F3C5 /* LiftServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F780B81A278EFC00E4F3C5 /* LiftServer.swift */; };
 		54F9444B1A82BE5200FC7328 /* TestSensorData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 54F9444A1A82BE5200FC7328 /* TestSensorData.swift */; };
 		54FBCD1F1A5BF0FA00E2CB2C /* arms-bicep-curl.dat in Resources */ = {isa = PBXBuildFile; fileRef = 54FBCD1E1A5BF0FA00E2CB2C /* arms-bicep-curl.dat */; };
+		793AA9F71AAF3C99007EDA95 /* SessionFeedbackController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 793AA9F61AAF3C99007EDA95 /* SessionFeedbackController.swift */; };
 		83596E4AB21AF7BB754F28CE /* libPods.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 604C4FB0BC879EB56AD28A81 /* libPods.a */; };
 /* End PBXBuildFile section */
 
@@ -327,6 +328,7 @@
 		54FBCD1E1A5BF0FA00E2CB2C /* arms-bicep-curl.dat */ = {isa = PBXFileReference; lastKnownFileType = file; path = "arms-bicep-curl.dat"; sourceTree = "<group>"; };
 		5D984E2C657088D05D0AE494 /* Pods.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = Pods.release.xcconfig; path = "Pods/Target Support Files/Pods/Pods.release.xcconfig"; sourceTree = "<group>"; };
 		604C4FB0BC879EB56AD28A81 /* libPods.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libPods.a; sourceTree = BUILT_PRODUCTS_DIR; };
+		793AA9F61AAF3C99007EDA95 /* SessionFeedbackController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SessionFeedbackController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -385,6 +387,7 @@
 				54CC699E19C4AD8E00B29EC8 /* LiveSessionDevicesController.swift */,
 				545E4F841A88F38000A009AB /* LiveSessionSensorDataGroupController.swift */,
 				54DF27DF1A87E2D300DB1323 /* LiveSession.storyboard */,
+				793AA9F61AAF3C99007EDA95 /* SessionFeedbackController.swift */,
 			);
 			name = Exercise;
 			sourceTree = "<group>";
@@ -1016,6 +1019,7 @@
 				5482963C1A4D792D00EDCAF0 /* AndroidWearDevice.swift in Sources */,
 				54E99EDA1A76823F00BA1BD3 /* ThisDeviceSession.swift in Sources */,
 				54F780B61A276E8700E4F3C5 /* AccountViewController.swift in Sources */,
+				793AA9F71AAF3C99007EDA95 /* SessionFeedbackController.swift in Sources */,
 				54306B701A2A2AD6005D6BC9 /* NewSessionController.swift in Sources */,
 				5405D78B1A87DC500037382A /* LiveSessionController.swift in Sources */,
 				54E5B1531A4B03E600BC71C0 /* LiftUserDefaults.swift in Sources */,

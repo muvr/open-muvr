@@ -42,7 +42,7 @@ extension Dictionary {
         var r = [Key : That](minimumCapacity: self.count)
         for (k, v) in self {
             if let value = f(v) {
-                r[k] = f(v)
+                r[k] = value
             }
         }
         return r

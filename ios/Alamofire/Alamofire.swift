@@ -68,7 +68,7 @@ public enum ParameterEncoding {
 
     /**
         Creates a URL request by encoding parameters and applying them onto an existing request.
-    
+
         :param: URLRequest The request to have parameters applied
         :param: parameters The parameters to apply
 
@@ -136,15 +136,16 @@ public enum ParameterEncoding {
 
     func queryComponents(key: String, _ value: AnyObject) -> [(String, String)] {
         var components: [(String, String)] = []
-        if let dictionary = value as? [String: AnyObject] {
+        switch value {
+        case let dictionary as [String: AnyObject]:
             for (nestedKey, value) in dictionary {
                 components += queryComponents("\(key)[\(nestedKey)]", value)
             }
-        } else if let array = value as? [AnyObject] {
+        case let array as [AnyObject]:
             for value in array {
                 components += queryComponents("\(key)[]", value)
             }
-        } else {
+        default:
             components.extend([(escape(key), escape("\(value)"))])
         }
 
@@ -347,7 +348,7 @@ public class Manager {
 
                 return subdelegate
             }
-            
+
             set {
                 dispatch_barrier_async(subdelegateQueue) {
                     self.subdelegates[task.taskIdentifier] = newValue
@@ -416,9 +417,7 @@ public class Manager {
         }
 
         func URLSession(session: NSURLSession!, task: NSURLSessionTask!, needNewBodyStream completionHandler: ((NSInputStream!) -> Void)!) {
-            if let delegate = self[task] {
-                delegate.URLSession(session, task: task, needNewBodyStream: completionHandler)
-            }
+            self[task]?.URLSession(session, task: task, needNewBodyStream: completionHandler)
         }
 
         func URLSession(session: NSURLSession!, task: NSURLSessionTask!, didSendBodyData bytesSent: Int64, totalBytesSent: Int64, totalBytesExpectedToSend: Int64) {
@@ -428,22 +427,14 @@ public class Manager {
         }
 
         func URLSession(session: NSURLSession!, task: NSURLSessionTask!, didCompleteWithError error: NSError!) {
-            if let delegate = self[task] {
-                delegate.URLSession(session, task: task, didCompleteWithError: error)
-
-                self[task] = nil
-            }
+            self[task]?.URLSession(session, task: task, didCompleteWithError: error)
+            self[task] = nil
         }
 
         // MARK: NSURLSessionDataDelegate
 
         func URLSession(session: NSURLSession!, dataTask: NSURLSessionDataTask!, didReceiveResponse response: NSURLResponse!, completionHandler: ((NSURLSessionResponseDisposition) -> Void)!) {
-            var disposition: NSURLSessionResponseDisposition = .Allow
-
-            if dataTaskDidReceiveResponse != nil {
-                disposition = dataTaskDidReceiveResponse!(session, dataTask, response)
-            }
-
+            let disposition = dataTaskDidReceiveResponse?(session, dataTask, response) ?? .Allow
             completionHandler(disposition)
         }
 
@@ -461,12 +452,7 @@ public class Manager {
         }
 
         func URLSession(session: NSURLSession!, dataTask: NSURLSessionDataTask!, willCacheResponse proposedResponse: NSCachedURLResponse!, completionHandler: ((NSCachedURLResponse!) -> Void)!) {
-            var cachedResponse = proposedResponse
-
-            if dataTaskWillCacheResponse != nil {
-                cachedResponse = dataTaskWillCacheResponse!(session, dataTask, proposedResponse)
-            }
-
+            let cachedResponse = dataTaskWillCacheResponse?(session, dataTask, proposedResponse) ?? proposedResponse
             completionHandler(cachedResponse)
         }
 
@@ -599,12 +585,15 @@ public class Request {
         :returns: The request.
     */
     public func progress(closure: ((Int64, Int64, Int64) -> Void)? = nil) -> Self {
-        if let uploadDelegate = delegate as? UploadTaskDelegate {
+        switch delegate {
+        case let uploadDelegate as UploadTaskDelegate:
             uploadDelegate.uploadProgress = closure
-        } else if let dataDelegate = delegate as? DataTaskDelegate {
+        case let dataDelegate as DataTaskDelegate:
             dataDelegate.dataProgress = closure
-        } else if let downloadDelegate = delegate as? DownloadTaskDelegate {
+        case let downloadDelegate as DownloadTaskDelegate:
             downloadDelegate.downloadProgress = closure
+        default:
+            break
         }
 
         return self
@@ -965,14 +954,9 @@ extension Request {
     */
     public func validate() -> Self {
         let acceptableStatusCodes: Range<Int> = 200..<300
-        let acceptableContentTypes: [String] = {
-            if let accept = self.request.valueForHTTPHeaderField("Accept") {
-                return accept.componentsSeparatedByString(",")
-            }
+        let acceptableContentTypes: [String] =
+            self.request.valueForHTTPHeaderField("Accept")?.componentsSeparatedByString(",") ?? ["*/*"]
 
-            return ["*/*"]
-        }()
-        
         return validate(statusCode: acceptableStatusCodes).validate(contentType: acceptableContentTypes)
     }
 }
@@ -1155,7 +1139,7 @@ extension Request {
 
     /**
         Creates a download file destination closure which uses the default file manager to move the temporary file to a file URL in the first available directory with the specified search path directory and search path domain mask.
-    
+
         :param: directory The search path directory. `.DocumentDirectory` by default.
         :param: domain The search path domain mask. `.UserDomainMask` by default.
 
@@ -1284,7 +1268,7 @@ extension Request: DebugPrintable {
                 components.append("-H \"\(field): \(value)\"")
             }
         }
-        
+
         if let HTTPBody = request.HTTPBody {
             if let escapedBody = NSString(data: HTTPBody, encoding: NSUTF8StringEncoding)?.stringByReplacingOccurrencesOfString("\"", withString: "\\\"") {
                 components.append("-d \"\(escapedBody)\"")
