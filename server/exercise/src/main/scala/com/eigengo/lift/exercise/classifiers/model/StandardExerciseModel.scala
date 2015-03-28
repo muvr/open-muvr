@@ -2,10 +2,10 @@ package com.eigengo.lift.exercise.classifiers.model
 
 import akka.actor.ActorLogging
 import akka.stream.scaladsl._
-import com.eigengo.lift.exercise.classifiers.ExerciseModel.Query
+import com.eigengo.lift.exercise.classifiers.QueryModel.Query
 import com.eigengo.lift.exercise.classifiers.workflows.{ClassificationAssertions, GestureWorkflows}
 import com.eigengo.lift.exercise._
-import com.eigengo.lift.exercise.classifiers.ExerciseModel
+import com.eigengo.lift.exercise.classifiers.{QueryModel, ExerciseModel}
 
 /**
  * Gesture classification model.
@@ -20,9 +20,10 @@ abstract class StandardExerciseModel(sessionProps: SessionProperties, tapSensor:
 
   import ClassificationAssertions._
   import FlowGraph.Implicits._
+  import QueryModel._
 
   // Workflow for recognising 'tap' gestures that are detected via `tapSensor`
-  object Tap extends GestureWorkflows("tap", context.system.settings.config)
+  object Tap extends GestureWorkflows("tap", context.system.settings.config, tapSensor)
 
   /**
    * Monitor wrist sensor and add in tap gesture detection.

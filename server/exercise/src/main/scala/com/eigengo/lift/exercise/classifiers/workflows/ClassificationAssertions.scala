@@ -1,29 +1,15 @@
 package com.eigengo.lift.exercise.classifiers.workflows
 
 import com.eigengo.lift.exercise._
+import com.eigengo.lift.exercise.classifiers.QueryModel.{Fact, GroundFact}
 
 object ClassificationAssertions {
 
   /**
-   * Facts that may hold of sensor data.
-   */
-  sealed trait Fact {
-    def toString(sensor: SensorDataSourceLocation): String
-  }
-
-  case class Neg(fact: GroundFact) extends Fact {
-    def toString(sensor: SensorDataSourceLocation) = "~" + fact.toString(sensor)
-  }
-
-  /**
-   * Ground facts logically model predicates regarding actual sensor data values
-   */
-  trait GroundFact extends Fact
-  /**
    * Named gesture matches with probability >= `matchProbability`
    */
-  case class Gesture(name: String, matchProbability: Double) extends GroundFact {
-    def toString(sensor: SensorDataSourceLocation): String = {
+  case class Gesture(name: String, matchProbability: Double, sensor: SensorDataSourceLocation) extends GroundFact {
+    override def toString: String = {
       s"($name@$sensor >= $matchProbability)"
     }
   }

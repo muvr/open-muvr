@@ -5,8 +5,8 @@ import akka.stream.scaladsl._
 import akka.stream.testkit.{StreamTestKit, AkkaSpec}
 import akka.testkit.TestActorRef
 import com.eigengo.lift.exercise.UserExercisesClassifier.{Tap => TapEvent}
-import com.eigengo.lift.exercise.classifiers.ExerciseModel
-import com.eigengo.lift.exercise.classifiers.workflows.ClassificationAssertions.{Neg, Gesture, BindToSensors}
+import com.eigengo.lift.exercise.classifiers.QueryModel
+import com.eigengo.lift.exercise.classifiers.workflows.ClassificationAssertions.{Gesture, BindToSensors}
 import com.eigengo.lift.exercise._
 import com.typesafe.config.ConfigFactory
 import java.text.SimpleDateFormat
@@ -15,7 +15,7 @@ import scala.io.{Source => IOSource}
 
 class StandardExerciseModelTest extends AkkaSpec(ConfigFactory.load("classification.conf")) {
 
-  import ExerciseModel._
+  import QueryModel._
   import StreamTestKit._
 
   // FIXME: why do we need a maximum prefetch buffer size of 64 here?
@@ -66,7 +66,7 @@ class StandardExerciseModelTest extends AkkaSpec(ConfigFactory.load("classificat
       }
 
       for (index <- 0 to (msgs.length - windowSize)) {
-        val fact = if (tapIndex.contains(index)) Gesture(name, threshold) else Neg(Gesture(name, threshold))
+        val fact = if (tapIndex.contains(index)) Gesture(name, threshold, SensorDataSourceLocationWrist) else Neg(Gesture(name, threshold, SensorDataSourceLocationWrist))
 
         out.expectNext(BindToSensors(Set(fact), Set(), Set(), Set(), Set(), msgs(index)))
       }

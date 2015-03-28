@@ -1,29 +1,27 @@
 package com.eigengo.lift.exercise.classifiers.model
 
 import akka.actor.ActorLogging
-import com.eigengo.lift.exercise.classifiers.ExerciseModel
-import com.eigengo.lift.exercise.classifiers.workflows.ClassificationAssertions
+import com.eigengo.lift.exercise.classifiers.QueryModel
 
 trait StandardEvaluation {
   this: ActorLogging =>
 
-  import ClassificationAssertions._
-  import ExerciseModel._
+  import QueryModel._
 
   // TODO: introduce memoisation into `evaluate` functions?
 
-  def evaluateAtSensor(path: Proposition, state: BindToSensors): Boolean = path match {
+  def evaluateAtSensor(path: Proposition, state: Set[Fact]): Boolean = path match {
     case True =>
       true
 
     case False =>
       false
 
-    case Assert(Neg(fact), sensor) =>
-      !state.toMap(sensor).contains(fact)
+    case Assert(Neg(fact)) =>
+      !state.contains(fact)
 
-    case Assert(fact, sensor) =>
-      state.toMap(sensor).contains(fact)
+    case Assert(fact) =>
+      state.contains(fact)
 
     case Conjunction(fact1, fact2, remaining @ _*) =>
       val results = (fact1 +: fact2 +: remaining).map(p => evaluateAtSensor(p, state))
@@ -34,7 +32,7 @@ trait StandardEvaluation {
       results.contains(true)
   }
 
-  def evaluateQuery(query: Query)(state: BindToSensors, lastState: Boolean): QueryValue = query match {
+  def evaluateQuery(query: Query)(state: Set[Fact], lastState: Boolean): QueryValue = query match {
     case Formula(fact) =>
       val result = evaluateAtSensor(fact, state)
       log.debug(s"st = $state\n  st |== $query\n  ~~> ${ if (result) "## TRUE ##" else "## FALSE ##"}")
@@ -103,7 +101,7 @@ trait StandardEvaluation {
 
     case All(Test(query1), query2) =>
       log.debug(s"st = $state\n  st |== $query\n  ~~> || st |== ~ $query1\n  ~~> || st |== $query2")
-      join(evaluateQuery(ExerciseModel.not(query1))(state, lastState), evaluateQuery(query2)(state, lastState))
+      join(evaluateQuery(QueryModel.not(query1))(state, lastState), evaluateQuery(query2)(state, lastState))
 
     case All(Choice(path1, path2, remainingPaths @ _*), query1) =>
       log.debug(s"st = $state\n  st |== $query${(path1 +: path2 +: remainingPaths).map(p => s"\n  ~~> && st |== All($p, $query1)").mkString("")}")

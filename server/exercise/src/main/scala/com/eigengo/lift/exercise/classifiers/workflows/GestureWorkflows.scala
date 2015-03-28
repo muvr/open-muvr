@@ -2,7 +2,8 @@ package com.eigengo.lift.exercise.classifiers.workflows
 
 import akka.stream.scaladsl._
 import breeze.linalg.DenseMatrix
-import com.eigengo.lift.exercise.AccelerometerValue
+import com.eigengo.lift.exercise.{SensorDataSourceLocation, AccelerometerValue}
+import com.eigengo.lift.exercise.classifiers.QueryModel
 import com.eigengo.lift.exercise.classifiers.svm.{SVMClassifier, SVMModelParser}
 import com.typesafe.config.Config
 
@@ -10,9 +11,10 @@ import com.typesafe.config.Config
  * Class that implements reactive stream components that use support vector machines (SVM) to recognise gesture events
  * (e.g. taps).
  */
-class GestureWorkflows(name: String, config: Config) extends SVMClassifier {
+class GestureWorkflows(name: String, config: Config, sensor: SensorDataSourceLocation) extends SVMClassifier {
 
   import ClassificationAssertions._
+  import QueryModel._
 
   lazy val threshold = {
     val value = config.getDouble(s"classification.gesture.$name.threshold")
@@ -54,9 +56,9 @@ class GestureWorkflows(name: String, config: Config) extends SVMClassifier {
           val matchProbability = probabilityOfGestureEvent(sample)
 
           if (matchProbability >= threshold) {
-            Some(Gesture(name, threshold))
+            Some(Gesture(name, threshold, sensor))
           } else {
-            Some(Neg(Gesture(name, threshold)))
+            Some(Neg(Gesture(name, threshold, sensor)))
           }
         } else {
           // Truncated windows are never classified (these typically occur when the stream closes)
