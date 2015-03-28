@@ -11,7 +11,7 @@ trait ModelGenerators {
 
   val GroundFactGen: Gen[GroundFact] = for {
     name <- arbitrary[String]
-  } yield new GroundFact { override def toString = name }
+  } yield new GroundFact(name) { override def toString = name }
 
   val FactGen: Gen[Fact] = frequency(
     1 -> (for { fact <- GroundFactGen } yield fact),

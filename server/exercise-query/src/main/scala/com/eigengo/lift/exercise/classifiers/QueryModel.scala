@@ -14,7 +14,7 @@ object QueryModel {
   /**
    * Ground facts logically model predicates regarding actual sensor data values
    */
-  trait GroundFact extends Fact
+  case class GroundFact(name: String, value: Option[Any] = None) extends Fact
 
   /**
    * We query exercise models using a DSL based upon a linear-time dynamic logic. Exercise sessions define the finite

@@ -55,12 +55,14 @@ class ExerciseModelTest
   case object Low extends RunningIntensity {
     override def toString = "low"
   }
-  case class Running(intensity: RunningIntensity, sensor: SensorDataSourceLocation) extends GroundFact {
-    override def toString = s"running@$sensor($intensity)"
-  }
-  case class Heartrate(rate: Int, sensor: SensorDataSourceLocation) extends GroundFact {
-    override def toString = s"heartrate@$sensor($rate)"
-  }
+  def Running(intensity: RunningIntensity, sensor: SensorDataSourceLocation): GroundFact =
+    new GroundFact("running", Some((intensity, sensor))) {
+      override def toString = s"running@$sensor($intensity)"
+    }
+  def Heartrate(rate: Int, sensor: SensorDataSourceLocation): GroundFact =
+    new GroundFact("heartrate", Some((rate, sensor))) {
+      override def toString = s"heartrate@$sensor($rate)"
+    }
 
   property("meet(complement(x), complement(y)) == complement(join(x, y))") {
     forAll(QueryValueGen, QueryValueGen) { (value1: QueryValue, value2: QueryValue) =>
@@ -552,7 +554,7 @@ class ExerciseModelTest
         Formula(Assert(Heartrate(180, SensorDataSourceLocationChest)))
       )
 
-    val runningGen: Gen[Running] = frequency(
+    val runningGen: Gen[GroundFact] = frequency(
       1 -> Gen.const(Running(High, SensorDataSourceLocationAny)),
       1 -> Gen.const(Running(Medium, SensorDataSourceLocationAny)),
       1 -> Gen.const(Running(Low, SensorDataSourceLocationAny))

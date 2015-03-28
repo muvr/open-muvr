@@ -8,11 +8,12 @@ object ClassificationAssertions {
   /**
    * Named gesture matches with probability >= `matchProbability`
    */
-  case class Gesture(name: String, matchProbability: Double, sensor: SensorDataSourceLocation) extends GroundFact {
-    override def toString: String = {
-      s"($name@$sensor >= $matchProbability)"
+  def Gesture(name: String, matchProbability: Double, sensor: SensorDataSourceLocation): GroundFact =
+    new GroundFact(name, Some((matchProbability, sensor))) {
+      override def toString: String = {
+        s"($name@$sensor >= $matchProbability)"
+      }
     }
-  }
 
   /**
    * Bind inferred (e.g. machine learnt) assertions to sensors in a network of sensors.

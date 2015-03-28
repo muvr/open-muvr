@@ -75,7 +75,7 @@ class RandomExerciseModel(sessionProps: SessionProperties)
       .map {
         case StableValue(true) =>
           val exercise = (query: @unchecked) match {
-            case Formula(Assert(Gesture(nm, _, _))) =>
+            case Formula(Assert(GroundFact(nm, _))) =>
               Exercise(nm, None, None)
           }
 
