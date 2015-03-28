@@ -34,7 +34,6 @@ Vagrant.configure(2) do |config|
     cd cvc4
 
     export JAVA_CPPFLAGS=-I/usr/lib/jvm/java-1.7.0-openjdk-amd64/include/
-    export DEBVERSION="1.4.1~`date +%Y%m%d`"
 
     ./autogen.sh
     ./configure --prefix=/usr --enable-unit-testing --enable-proof --with-portfolio --enable-language-bindings=java
