@@ -21,7 +21,7 @@ lazy val spark = project.in(file("spark"))
 
 // Exercise
 lazy val exercise = project.in(file("exercise"))
-  .dependsOn(notificationProtocol, profileProtocol, common, exerciseQuery)
+  .dependsOn(notificationProtocol, profileProtocol, common, exerciseQuery % "test->test;compile->compile")
   .configs(LongRunningTest, ShortRunningTest)
   .settings(inConfig(LongRunningTest)(Defaults.testTasks): _*)
   .settings(inConfig(ShortRunningTest)(Defaults.testTasks): _*)
@@ -32,7 +32,6 @@ lazy val exercise = project.in(file("exercise"))
 
 // Exercise Querying
 lazy val exerciseQuery = project.in(file("exercise-query"))
-  .dependsOn(common)
   .configs(LongRunningTest, ShortRunningTest)
   .settings(inConfig(LongRunningTest)(Defaults.testTasks): _*)
   .settings(inConfig(ShortRunningTest)(Defaults.testTasks): _*)
@@ -50,10 +49,10 @@ lazy val notification = project.in(file("notification")).dependsOn(common, notif
 lazy val notificationProtocol = project.in(file("notification-protocol")).dependsOn(common)
 
 // Main
-lazy val main = project.in(file("main")).dependsOn(exercise, profile, notification, common, exerciseQuery)
+lazy val main = project.in(file("main")).dependsOn(exercise, profile, notification, common)
 
 // The main aggregate
-lazy val root = (project in file(".")).aggregate(main, exercise, profile, notification, common, exerciseQuery, spark)
+lazy val root = (project in file(".")).aggregate(main, exercise, profile, notification, common, spark)
 
 fork in Test := false
 
