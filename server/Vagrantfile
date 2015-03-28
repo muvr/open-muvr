@@ -37,7 +37,7 @@ Vagrant.configure(2) do |config|
     export DEBVERSION="1.4.1~`date +%Y%m%d`"
 
     ./autogen.sh
-    ./configure  --enable-unit-testing --enable-proof --with-portfolio --enable-language-bindings=java
+    ./configure --prefix=/usr --enable-unit-testing --enable-proof --with-portfolio --enable-language-bindings=java
     make
     make check
     make install
