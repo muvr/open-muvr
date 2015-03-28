@@ -6,6 +6,9 @@
 #
 # It can be used to run all tests within a development environment (e.g. via `cd /vagrant; sbt test`)
 
+# If no CVC4 commit value/version is specified, we build `master`
+VERSION = ENV["VERSION"] || "master"
+
 Vagrant.configure(2) do |config|
   config.vm.box = "ubuntu-trusty64"
   config.vm.box_url = "https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box"
@@ -16,21 +19,29 @@ Vagrant.configure(2) do |config|
   end
 
   # Ensure that the image is provisioned with:
-  #   - JDK 8
+  #   - JDK 7 (current CVC4 JNI binding requirement)
   #   - SBT
   #   - CVC4 (with Java JNI bindings)
-  #
-  # NOTE: Debian packages (i.e. `cvc4` and `libcvc4bindings-java3`) in the directory `/vagrant/debs` are (currently)
-  # sourced from:
-  #   deb http://cvc4.cs.nyu.edu/debian unstable/
   config.vm.provision "shell", inline: <<-SHELL
-    echo oracle-java8-installer shared/accepted-oracle-license-v1-1 select true | sudo /usr/bin/debconf-set-selections
-    sudo add-apt-repository -y ppa:webupd8team/java
     echo "deb http://dl.bintray.com/sbt/debian /" | sudo tee /etc/apt/sources.list.d/sbt.list
     sudo apt-get -y update
-    sudo apt-get install -y git
-    sudo apt-get install -y oracle-java8-installer
-    sudo apt-get install -y --force-yes sbt libantlr3c-3.2-0
-    sudo dpkg -R -i /vagrant/debs
+    sudo apt-get install -y git autoconf libtool
+    sudo apt-get install -y libgmp-dev antlr3 libantlr3c-dev libboost-dev libboost-thread-dev swig2.0 libcln-dev openjdk-7-jdk
+    sudo apt-get install -y --force-yes sbt cxxtest
+
+    cd /tmp
+    git clone -b #{VERSION} https://github.com/CVC4/CVC4.git cvc4
+    cd cvc4
+
+    export JAVA_CPPFLAGS=-I/usr/lib/jvm/java-1.7.0-openjdk-amd64/include/
+    export DEBVERSION="1.4.1~`date +%Y%m%d`"
+
+    ./autogen.sh
+    ./configure  --enable-unit-testing --enable-proof --with-portfolio --enable-language-bindings=java
+    make
+    make check
+    make install
+
+    cp ./builds/x86_64-unknown-linux-gnu/production-proof/src/bindings/CVC4.jar /vagrant/exercise-query/lib
   SHELL
 end
