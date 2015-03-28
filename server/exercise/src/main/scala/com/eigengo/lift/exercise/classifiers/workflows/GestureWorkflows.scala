@@ -47,7 +47,7 @@ class GestureWorkflows(name: String, config: Config, sensor: SensorDataSourceLoc
   /**
    * Flow that taps the in stream and, if a gesture is recognised, sends a `Fact` message to the `out` sink.
    */
-  def identifyEvent: Flow[AccelerometerValue, Option[Fact], Unit] =
+  def identifyEvent: Flow[AccelerometerValue, Option[GroundFact], Unit] =
     Flow[AccelerometerValue]
       .transform(() => SlidingWindow[AccelerometerValue](windowSize))
       .map { (sample: List[AccelerometerValue]) =>
@@ -58,7 +58,7 @@ class GestureWorkflows(name: String, config: Config, sensor: SensorDataSourceLoc
           if (matchProbability >= threshold) {
             Some(Gesture(name, threshold, sensor))
           } else {
-            Some(Neg(Gesture(name, threshold, sensor)))
+            None
           }
         } else {
           // Truncated windows are never classified (these typically occur when the stream closes)

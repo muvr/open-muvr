@@ -66,9 +66,9 @@ class StandardExerciseModelTest extends AkkaSpec(ConfigFactory.load("classificat
       }
 
       for (index <- 0 to (msgs.length - windowSize)) {
-        val fact = if (tapIndex.contains(index)) Gesture(name, threshold, SensorDataSourceLocationWrist) else Neg(Gesture(name, threshold, SensorDataSourceLocationWrist))
+        val fact: Set[GroundFact] = if (tapIndex.contains(index)) Set(Gesture(name, threshold, SensorDataSourceLocationWrist)) else Set.empty
 
-        out.expectNext(BindToSensors(Set(fact), Set(), Set(), Set(), Set(), msgs(index)))
+        out.expectNext(BindToSensors(fact, msgs(index)))
       }
     }
   }

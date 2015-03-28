@@ -44,7 +44,7 @@ class RandomExerciseModel(sessionProps: SessionProperties)
 
   private val metadata = ModelMetadata(2)
 
-  private def randomExercise(sensor: SensorDataSourceLocation): Set[Fact] = {
+  private def randomExercise(sensor: SensorDataSourceLocation): Set[GroundFact] = {
     val mgk = Random.shuffle(sessionProps.muscleGroupKeys).head
     if (exercises.get(mgk).isEmpty) {
       Set.empty
@@ -62,11 +62,11 @@ class RandomExerciseModel(sessionProps: SessionProperties)
         val sensor = Random.shuffle(sn.toMap.keys).head
         val classification = randomExercise(sensor)
 
-        BindToSensors(sn.toMap.map { case (location, _) => if (location == sensor) (location, classification) else (location, Set.empty[Fact]) }.toMap, sn)
+        BindToSensors(classification, sn)
       }
 
   // Random model evaluator always returns true!
-  def evaluateQuery(query: Query)(current: BindToSensors, lastState: Boolean) =
+  def evaluateQuery(query: Query)(current: Set[GroundFact], lastState: Boolean) =
     StableValue(result = true)
 
   // Random exercises are returned for 2% of received sensor values

@@ -17,7 +17,7 @@ class CVC4Test
 
   import QueryModel._
 
-  val cvc4 = new CVC4(ConfigFactory.load("test.conf"))
+  val cvc4 = new CVC4(ConfigFactory.load("prover.conf"))
 
   override def afterAll() {
     println("CVC4 prover statistics:")

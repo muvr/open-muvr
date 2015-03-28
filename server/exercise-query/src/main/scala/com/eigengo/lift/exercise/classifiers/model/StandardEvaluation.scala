@@ -10,7 +10,7 @@ trait StandardEvaluation {
 
   // TODO: introduce memoisation into `evaluate` functions?
 
-  def evaluateAtSensor(path: Proposition, state: Set[Fact]): Boolean = path match {
+  def evaluateAtSensor(path: Proposition, state: Set[GroundFact]): Boolean = path match {
     case True =>
       true
 
@@ -20,7 +20,7 @@ trait StandardEvaluation {
     case Assert(Neg(fact)) =>
       !state.contains(fact)
 
-    case Assert(fact) =>
+    case Assert(fact: GroundFact) =>
       state.contains(fact)
 
     case Conjunction(fact1, fact2, remaining @ _*) =>
@@ -32,7 +32,7 @@ trait StandardEvaluation {
       results.contains(true)
   }
 
-  def evaluateQuery(query: Query)(state: Set[Fact], lastState: Boolean): QueryValue = query match {
+  def evaluateQuery(query: Query)(state: Set[GroundFact], lastState: Boolean): QueryValue = query match {
     case Formula(fact) =>
       val result = evaluateAtSensor(fact, state)
       log.debug(s"st = $state\n  st |== $query\n  ~~> ${ if (result) "## TRUE ##" else "## FALSE ##"}")

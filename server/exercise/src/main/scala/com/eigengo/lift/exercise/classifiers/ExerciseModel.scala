@@ -49,7 +49,7 @@ abstract class ExerciseModel(name: String, sessionProps: SessionProperties, toWa
    * @param event     new event received by the sensor network
    * @param lastState determines if this is the last event to be received by the sensor network or not
    */
-  protected def evaluateQuery(current: Query)(event: BindToSensors, lastState: Boolean): QueryValue
+  protected def evaluateQuery(current: Query)(event: Set[GroundFact], lastState: Boolean): QueryValue
 
   /**
    * Defined by implementing subclasses. Configurable flow that determines the (optional) message sent back to the
@@ -82,10 +82,10 @@ abstract class ExerciseModel(name: String, sessionProps: SessionProperties, toWa
           stableState.get
 
         case List(event) =>
-          evaluateQuery(currentState)(event, lastState = true)
+          evaluateQuery(currentState)(event.facts, lastState = true)
 
         case List(event, _) =>
-          evaluateQuery(currentState)(event, lastState = false)
+          evaluateQuery(currentState)(event.facts, lastState = false)
       }
       log.debug(s"\n  EVALUATE: $currentState\n  ~~> $result")
       result match {

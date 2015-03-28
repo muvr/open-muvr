@@ -9,9 +9,13 @@ trait ModelGenerators {
 
   val defaultDepth = 3
 
+  val GroundFactGen: Gen[GroundFact] = for {
+    name <- arbitrary[String]
+  } yield new GroundFact { override def toString = name }
+
   val FactGen: Gen[Fact] = frequency(
-    1 -> (for { name <- arbitrary[String] } yield new GroundFact { override def toString = name }),
-    1 -> (for { name <- arbitrary[String] } yield Neg(new GroundFact { override def toString = name }))
+    1 -> (for { fact <- GroundFactGen } yield fact),
+    1 -> (for { fact <- GroundFactGen } yield Neg(fact))
   )
 
   def PropositionGen(depth: Int = defaultDepth): Gen[Proposition] = frequency(
