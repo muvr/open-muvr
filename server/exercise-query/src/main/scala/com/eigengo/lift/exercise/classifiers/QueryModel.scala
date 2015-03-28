@@ -12,7 +12,7 @@ object QueryModel {
   }
 
   /**
-   * Ground facts logically model predicates regarding actual sensor data values
+   * Ground facts logically model named predicates regarding Scala values
    */
   case class GroundFact(name: String, value: Option[Any] = None) extends Fact
 
