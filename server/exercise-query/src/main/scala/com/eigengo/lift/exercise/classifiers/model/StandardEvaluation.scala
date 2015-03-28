@@ -10,7 +10,7 @@ trait StandardEvaluation {
 
   // TODO: introduce memoisation into `evaluate` functions?
 
-  def evaluateAtSensor(path: Proposition, state: Set[GroundFact]): Boolean = path match {
+  def evaluateAtState(path: Proposition, state: Set[GroundFact]): Boolean = path match {
     case True =>
       true
 
@@ -24,17 +24,17 @@ trait StandardEvaluation {
       state.contains(fact)
 
     case Conjunction(fact1, fact2, remaining @ _*) =>
-      val results = (fact1 +: fact2 +: remaining).map(p => evaluateAtSensor(p, state))
+      val results = (fact1 +: fact2 +: remaining).map(p => evaluateAtState(p, state))
       results.forall(_ == true)
 
     case Disjunction(fact1, fact2, remaining @ _*) =>
-      val results = (fact1 +: fact2 +: remaining).map(p => evaluateAtSensor(p, state))
+      val results = (fact1 +: fact2 +: remaining).map(p => evaluateAtState(p, state))
       results.contains(true)
   }
 
   def evaluateQuery(query: Query)(state: Set[GroundFact], lastState: Boolean): QueryValue = query match {
     case Formula(fact) =>
-      val result = evaluateAtSensor(fact, state)
+      val result = evaluateAtState(fact, state)
       log.debug(s"st = $state\n  st |== $query\n  ~~> ${ if (result) "## TRUE ##" else "## FALSE ##"}")
       StableValue(result = result)
 
@@ -56,7 +56,7 @@ trait StandardEvaluation {
       val results = (query1 +: query2 +: remaining).map(q => evaluateQuery(q)(state, lastState))
       results.foldRight[QueryValue](StableValue(result = false)) { case (p, q) => join(p, q) }
 
-    case Exists(AssertFact(fact), query1) if !lastState && evaluateAtSensor(fact, state) =>
+    case Exists(AssertFact(fact), query1) if !lastState && evaluateAtState(fact, state) =>
       // for some `AssertFact(fact)` step (whilst not in last trace step)
       log.debug(s"st = $state\n  st |== $query\n  ~~> && st |=/= End \t## TRUE ##\n  ~~> && st |== $fact \t## TRUE ##\n  ~~> && st |== '$query1'")
       UnstableValue(query1)
@@ -89,7 +89,7 @@ trait StandardEvaluation {
         evaluateQuery(Exists(path, Exists(Repeat(path), query1)))(state, lastState)
       )
 
-    case All(AssertFact(fact), query1) if !lastState && evaluateAtSensor(fact, state) =>
+    case All(AssertFact(fact), query1) if !lastState && evaluateAtState(fact, state) =>
       // for all `AssertFact(fact)` steps (whilst not in last trace step)
       log.debug(s"st = $state\n  st |== $query\n  ~~> && st |=/= End \t## TRUE ##\n  ~~> && st |== $fact \t## TRUE ##\n  ~~> && st |== '$query1'")
       UnstableValue(query1)

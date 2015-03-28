@@ -30,13 +30,19 @@ abstract class StandardExerciseModel(sessionProps: SessionProperties, tapSensor:
    */
   val workflow = {
     Flow() { implicit builder =>
-      val classifier = Tap.identifyEvent
+      val classifier = Tap.identifyEvent.map {
+        case Some(fact: GroundFact) =>
+          Set(fact)
+
+        case _ =>
+          Set.empty[GroundFact]
+      }
       val split = builder.add(Broadcast[SensorNetValue](2))
       val merge = builder.add(Zip[Set[GroundFact], SensorNetValue]())
 
       split ~> Flow[SensorNetValue]
         .mapConcat(_.toMap(tapSensor).find(_.isInstanceOf[AccelerometerValue]).asInstanceOf[Option[AccelerometerValue]].toList)
-        .via(classifier.map(_.toSet)) ~> merge.in0
+        .via(classifier) ~> merge.in0
 
       split ~> merge.in1
 
