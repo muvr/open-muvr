@@ -17,7 +17,7 @@ export LDFLAGS:=$(shell dpkg-buildflags --get LDFLAGS)
 	dh $@ --parallel
 
 override_dh_auto_configure:
-    ./autogen.sh
+	./autogen.sh
 	dh_auto_configure -- --enable-proof --with-portfolio --enable-language-bindings=java JAVA_CPPFLAGS='$(CPPFLAGS) -I/usr/lib/jvm/java-7-openjdk-amd64/include'
 
 # Skip unit tests (by doing a "make regress" instead of "make check") to avoid a
