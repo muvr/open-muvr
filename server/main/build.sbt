@@ -58,9 +58,9 @@ dockerfile in docker := {
     // Install CVC4, JNI shared library/bindings - used by exercise classification models
     //
     // NOTE: Debian packages (i.e. `cvc4` and `libcvc4bindings-java3`) in the `debs` directory are (currently)
-    // sourced from:
-    //   deb http://cvc4.cs.nyu.edu/debian unstable/
-    run("apt-get", "install", "-y", "--force-yes", "libantlr3c-3.2-0")
+    // built in the Vagrant `build` environment using the Github repository:
+    //   https://github.com/CVC4/CVC4
+    run("apt-get", "install", "-y", "--force-yes", "antlr3", "libantlr3c")
     run("dpkg", "-R", "-i", debTargetPath)
     entryPoint("java", "-jar", artifactTargetPath)
   }
