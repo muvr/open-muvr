@@ -74,7 +74,7 @@ EOF
       sudo apt-get -y update
       sudo apt-get install -y git
       sudo apt-get install -y openjdk-7-jdk
-      sudo apt-get install -y --force-yes sbt antlr3 libantlr3c
+      sudo apt-get install -y --force-yes sbt libantlr3c-3.2-0
       sudo dpkg -R -i /vagrant/debs
     SHELL
   end
