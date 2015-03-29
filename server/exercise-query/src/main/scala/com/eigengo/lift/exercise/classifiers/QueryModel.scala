@@ -14,7 +14,7 @@ object QueryModel {
   /**
    * Ground facts logically model named predicates regarding Scala values
    */
-  case class GroundFact(name: String, value: Option[Any] = None) extends Fact
+  case class GroundFact(name: String, values: Any*) extends Fact
 
   /**
    * We query exercise models using a DSL based upon a linear-time dynamic logic. Exercise sessions define the finite

@@ -9,7 +9,7 @@ object ClassificationAssertions {
    * Named gesture matches with probability >= `matchProbability`
    */
   def Gesture(name: String, matchProbability: Double, sensor: SensorDataSourceLocation): GroundFact =
-    new GroundFact(name, Some((matchProbability, sensor))) {
+    new GroundFact(name, matchProbability, sensor) {
       override def toString: String = {
         s"($name@$sensor >= $matchProbability)"
       }
