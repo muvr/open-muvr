@@ -12,7 +12,7 @@ object QueryModel {
   }
 
   /**
-   * Ground facts logically model named predicates regarding Scala values
+   * Ground facts logically model named ground predicates (Scala values are embedded as constants)
    */
   case class GroundFact(name: String, values: Any*) extends Fact
 
