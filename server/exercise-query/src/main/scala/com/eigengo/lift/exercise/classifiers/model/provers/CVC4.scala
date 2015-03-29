@@ -1,6 +1,6 @@
 package com.eigengo.lift.exercise.classifiers.model.provers
 
-import com.eigengo.lift.exercise.classifiers.ExerciseModel
+import com.eigengo.lift.exercise.classifiers.QueryModel
 import com.eigengo.lift.exercise.classifiers.model.SMTInterface
 import com.typesafe.config.Config
 import edu.nyu.acsys.CVC4._
@@ -23,7 +23,7 @@ class CVC4(config: Config) extends SMTInterface {
 
   System.load(config.getString("prover.cvc.library"))
 
-  import ExerciseModel._
+  import QueryModel._
 
   private val em = new ExprManager()
   private val smt = new SmtEngine(em)

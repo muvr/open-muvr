@@ -21,7 +21,17 @@ lazy val spark = project.in(file("spark"))
 
 // Exercise
 lazy val exercise = project.in(file("exercise"))
-  .dependsOn(notificationProtocol, profileProtocol, common)
+  .dependsOn(notificationProtocol, profileProtocol, common, exerciseQuery % "test->test;compile->compile")
+  .configs(LongRunningTest, ShortRunningTest)
+  .settings(inConfig(LongRunningTest)(Defaults.testTasks): _*)
+  .settings(inConfig(ShortRunningTest)(Defaults.testTasks): _*)
+  .settings(
+    testOptions in LongRunningTest := Seq(Tests.Filter(longRunningTests.contains)),
+    testOptions in ShortRunningTest := Seq(Tests.Filter((name: String) => !longRunningTests.contains(name)))
+  )
+
+// Exercise Querying
+lazy val exerciseQuery = project.in(file("exercise-query"))
   .configs(LongRunningTest, ShortRunningTest)
   .settings(inConfig(LongRunningTest)(Defaults.testTasks): _*)
   .settings(inConfig(ShortRunningTest)(Defaults.testTasks): _*)

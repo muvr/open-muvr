@@ -1,0 +1,32 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+# This file was originally written by Joey Hess and Craig Small.
+# As a special exception, when this file is copied by dh-make into a
+# dh-make output file, you may use that output file without restriction.
+# This special exception was added by Craig Small in version 0.37 of dh-make.
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+export CPPFLAGS:=$(shell dpkg-buildflags --get CPPFLAGS)
+export CFLAGS:=$(shell dpkg-buildflags --get CFLAGS)
+export CXXFLAGS:=$(shell dpkg-buildflags --get CXXFLAGS)
+export LDFLAGS:=$(shell dpkg-buildflags --get LDFLAGS)
+
+%:
+	dh $@ --parallel
+
+override_dh_auto_configure:
+	./autogen.sh
+	dh_auto_configure -- --enable-proof --with-portfolio --enable-language-bindings=java JAVA_CPPFLAGS='$(CPPFLAGS) -I/usr/lib/jvm/java-7-openjdk-amd64/include'
+
+# Skip unit tests (by doing a "make regress" instead of "make check") to avoid a
+# build dependency on CxxTest, which isn't(?) packaged for Debian.
+override_dh_auto_test:
+	$(MAKE) regress
+
+# verbose shlibs warnings
+override_dh_makeshlibs:
+	dh_makeshlibs -- -V
+override_dh_shlibdeps:
+	dh_shlibdeps -- -v

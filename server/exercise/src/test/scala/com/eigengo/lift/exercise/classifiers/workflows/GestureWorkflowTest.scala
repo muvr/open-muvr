@@ -3,7 +3,8 @@ package com.eigengo.lift.exercise.classifiers.workflows
 import akka.stream.{ActorFlowMaterializer, ActorFlowMaterializerSettings}
 import akka.stream.scaladsl._
 import akka.stream.testkit.{StreamTestKit, AkkaSpec}
-import com.eigengo.lift.exercise.AccelerometerValue
+import com.eigengo.lift.exercise.{SensorDataSourceLocationWrist, AccelerometerValue}
+import com.eigengo.lift.exercise.classifiers.QueryModel
 import com.typesafe.config.ConfigFactory
 import scala.io.{Source => IOSource}
 
@@ -11,10 +12,11 @@ class GestureWorkflowTest extends AkkaSpec(ConfigFactory.load("classification.co
 
   import ClassificationAssertions._
   import StreamTestKit._
+  import QueryModel._
 
   val name = "tap"
 
-  object Tap extends GestureWorkflows(name, system.settings.config)
+  object Tap extends GestureWorkflows(name, system.settings.config, SensorDataSourceLocationWrist)
 
   val settings = ActorFlowMaterializerSettings(system).withInputBuffer(initialSize = 1, maxSize = 1)
 
@@ -49,7 +51,7 @@ class GestureWorkflowTest extends AkkaSpec(ConfigFactory.load("classification.co
 
       for ((msg, index) <- msgs.zipWithIndex) {
         if (index <= msgs.length - Tap.windowSize) {
-          outProbe.expectNext(Some(Neg(Gesture(name, Tap.threshold))))
+          outProbe.expectNext(Some(Neg(Gesture(name, Tap.threshold, SensorDataSourceLocationWrist))))
         } else {
           outProbe.expectNext(None)
         }
@@ -78,9 +80,9 @@ class GestureWorkflowTest extends AkkaSpec(ConfigFactory.load("classification.co
         if (index > msgs.length - Tap.windowSize) {
           event should be(None)
         } else if (gestureWindow.contains(index)) {
-          event should be(Some(Gesture(name, Tap.threshold)))
+          event should be(Some(Gesture(name, Tap.threshold, SensorDataSourceLocationWrist)))
         } else {
-          event should be(Some(Neg(Gesture(name, Tap.threshold))))
+          event should be(Some(Neg(Gesture(name, Tap.threshold, SensorDataSourceLocationWrist))))
         }
       }
     }

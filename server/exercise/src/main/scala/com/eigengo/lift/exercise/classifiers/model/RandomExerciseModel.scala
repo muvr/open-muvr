@@ -7,7 +7,7 @@ import com.eigengo.lift.exercise.UserExercises.ModelMetadata
 import com.eigengo.lift.exercise.UserExercisesClassifier.{UnclassifiedExercise, FullyClassifiedExercise}
 import com.eigengo.lift.exercise.classifiers.ExerciseModel
 import com.eigengo.lift.exercise._
-import com.eigengo.lift.exercise.classifiers.ExerciseModel._
+import com.eigengo.lift.exercise.classifiers.QueryModel._
 import com.eigengo.lift.exercise.classifiers.workflows.ClassificationAssertions._
 import scala.concurrent.{ExecutionContext, Future}
 import scala.util.Random
@@ -36,7 +36,7 @@ object RandomExerciseModel {
  * the listening actor).
  */
 class RandomExerciseModel(sessionProps: SessionProperties)
-  extends ExerciseModel("random", sessionProps, for (sensor <- Sensor.sourceLocations; exercise <- RandomExerciseModel.exercises.values.flatten) yield Formula(Assert(Gesture(exercise, 0.80), sensor)))(RandomExerciseModel.prover)
+  extends ExerciseModel("random", sessionProps, for (sensor <- Sensor.sourceLocations; exercise <- RandomExerciseModel.exercises.values.flatten) yield Formula(Assert(Gesture(exercise, 0.80, sensor))))(RandomExerciseModel.prover)
   with Actor
   with ActorLogging {
 
@@ -44,14 +44,14 @@ class RandomExerciseModel(sessionProps: SessionProperties)
 
   private val metadata = ModelMetadata(2)
 
-  private def randomExercise(): Set[Fact] = {
+  private def randomExercise(sensor: SensorDataSourceLocation): Set[GroundFact] = {
     val mgk = Random.shuffle(sessionProps.muscleGroupKeys).head
     if (exercises.get(mgk).isEmpty) {
       Set.empty
     } else {
       val exerciseType = Random.shuffle(exercises.get(mgk).get).head
 
-      Set(Gesture(exerciseType, 0.80))
+      Set(Gesture(exerciseType, 0.80, sensor))
     }
   }
 
@@ -59,14 +59,14 @@ class RandomExerciseModel(sessionProps: SessionProperties)
   val workflow =
     Flow[SensorNetValue]
       .map { sn =>
-        val classification = randomExercise()
         val sensor = Random.shuffle(sn.toMap.keys).head
+        val classification = randomExercise(sensor)
 
-        BindToSensors(sn.toMap.map { case (location, _) => if (location == sensor) (location, classification) else (location, Set.empty[Fact]) }.toMap, sn)
+        BindToSensors(classification, sn)
       }
 
   // Random model evaluator always returns true!
-  def evaluateQuery(query: Query)(current: BindToSensors, lastState: Boolean) =
+  def evaluateQuery(query: Query)(current: Set[GroundFact], lastState: Boolean) =
     StableValue(result = true)
 
   // Random exercises are returned for 2% of received sensor values
@@ -75,7 +75,7 @@ class RandomExerciseModel(sessionProps: SessionProperties)
       .map {
         case StableValue(true) =>
           val exercise = (query: @unchecked) match {
-            case Formula(Assert(Gesture(nm, _), _)) =>
+            case Formula(Assert(GroundFact(nm, _))) =>
               Exercise(nm, None, None)
           }
 

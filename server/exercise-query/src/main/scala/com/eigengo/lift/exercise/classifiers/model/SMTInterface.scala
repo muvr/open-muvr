@@ -1,11 +1,11 @@
 package com.eigengo.lift.exercise.classifiers.model
 
-import com.eigengo.lift.exercise.classifiers.ExerciseModel
+import com.eigengo.lift.exercise.classifiers.QueryModel
 import scala.concurrent.{ExecutionContext, Future}
 
 trait SMTInterface {
 
-  import ExerciseModel._
+  import QueryModel._
 
   /**
    * Function that treats the query as a propositional formula (so, path expressions are taken to be "propositional")
