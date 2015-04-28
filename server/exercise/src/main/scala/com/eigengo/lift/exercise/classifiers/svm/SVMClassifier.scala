@@ -59,6 +59,23 @@ trait SVMClassifier {
   }
 
   /**
+   * Applies a preprocessing pipeline to data before classification
+   * @param data The data matrix.
+   * @param scaled Scaling.
+   * @return Feature vector.
+   */
+  def preprocessingPipeline(data: DenseMatrix[Double], scaled: Option[SVMScale]): DenseVector[Double] = {
+    //val feature = discreteCosineTransform(data)
+    val featureVector = data.toDenseVector // column-major transformation
+    val scaledFeature = scaled.map {
+        case scaling =>
+          (featureVector :- scaling.center) :/ scaling.scale
+      }.getOrElse(featureVector)
+
+    scaledFeature
+  }
+
+  /**
    * Use an SVM model to classify given data. Raw classification result and matching probability returned by this function.
    *
    * @param svm  (trained) SVM model to be used in prediction
@@ -66,12 +83,7 @@ trait SVMClassifier {
    * @param rbf  radial basis function that the SVM predictor is to use
    */
   def predict(svm: SVMModel, data: DenseMatrix[Double], rbf: (DenseVector[Double], DenseVector[Double], Double) => Double): SVMClassification = {
-    val feature = discreteCosineTransform(data)
-    val featureVector = feature.toDenseVector // row-major transformation
-    val scaledFeature = svm.scaled.map {
-      case scaling =>
-        (featureVector :- scaling.center) :/ scaling.scale
-    }.getOrElse(featureVector)
+    val scaledFeature = preprocessingPipeline(data, svm.scaled)
     val result = sum((0 until svm.nSV).map(j => rbf(svm.SV(j,::).t, scaledFeature, svm.gamma) * svm.coefs(j))) - svm.rho
     val probability = 1 / (1 + exp(svm.probA * result + svm.probB))
 
