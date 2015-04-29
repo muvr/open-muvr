@@ -67,6 +67,7 @@ trait SVMClassifier {
   def preprocessingPipeline(data: DenseMatrix[Double], scaled: Option[SVMScale]): DenseVector[Double] = {
     //val feature = discreteCosineTransform(data)
     val featureVector = data.toDenseVector // column-major transformation
+
     val scaledFeature = scaled.map {
         case scaling =>
           (featureVector :- scaling.center) :/ scaling.scale
@@ -84,6 +85,7 @@ trait SVMClassifier {
    */
   def predict(svm: SVMModel, data: DenseMatrix[Double], rbf: (DenseVector[Double], DenseVector[Double], Double) => Double): SVMClassification = {
     val scaledFeature = preprocessingPipeline(data, svm.scaled)
+
     val result = sum((0 until svm.nSV).map(j => rbf(svm.SV(j,::).t, scaledFeature, svm.gamma) * svm.coefs(j))) - svm.rho
     val probability = 1 / (1 + exp(svm.probA * result + svm.probB))
 
