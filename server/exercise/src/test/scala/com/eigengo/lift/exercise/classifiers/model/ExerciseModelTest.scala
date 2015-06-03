@@ -56,11 +56,11 @@ class ExerciseModelTest
     override def toString = "low"
   }
   def Running(intensity: RunningIntensity, sensor: SensorDataSourceLocation): GroundFact =
-    new GroundFact("running", Some((intensity, sensor))) {
+    new GroundFact("running", intensity, sensor) {
       override def toString = s"running@$sensor($intensity)"
     }
   def Heartrate(rate: Int, sensor: SensorDataSourceLocation): GroundFact =
-    new GroundFact("heartrate", Some((rate, sensor))) {
+    new GroundFact("heartrate", rate, sensor) {
       override def toString = s"heartrate@$sensor($rate)"
     }
 
